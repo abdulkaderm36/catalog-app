@@ -4,7 +4,7 @@ import { z } from "zod";
 config();
 
 const envSchema = z.object({
-  PORT: z.coerce.number().default(3000),
+  PORT: z.coerce.number().default(3001),
   APP_URL: z.string().url().default("http://localhost:5173"),
   JWT_SECRET: z.string().min(16, "JWT_SECRET must be at least 16 characters long"),
   DATABASE_URL: z.string().url(),
