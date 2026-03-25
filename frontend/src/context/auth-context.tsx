@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import type { ReactNode } from "react";
 
 interface User {
   id: string;
@@ -17,22 +18,28 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/auth/me", { credentials: "include" })
+    const controller = new AbortController();
+    fetch("/api/auth/me", { credentials: "include", signal: controller.signal })
       .then(r => r.ok ? r.json() : null)
       .then(data => setUser(data))
-      .catch(() => setUser(null))
+      .catch(err => { if (err.name !== "AbortError") setUser(null); })
       .finally(() => setIsLoading(false));
+    return () => controller.abort();
   }, []);
 
   const login = useCallback((u: User) => setUser(u), []);
 
   const logout = useCallback(async () => {
-    await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+    try {
+      await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+    } catch {
+      // Network failure — still clear local state
+    }
     setUser(null);
   }, []);
 
