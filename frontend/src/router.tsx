@@ -1,6 +1,8 @@
 import { createBrowserRouter } from "react-router-dom";
 
-import { AppShell } from "./ui/app-shell";
+import { AppShell } from "./components/layout/app-shell";
+import { AuthLayout } from "./components/layout/auth-layout";
+import { AuthGuard } from "./components/layout/auth-guard";
 import { CatalogPage } from "./views/catalog-page";
 import { DashboardPage } from "./views/dashboard-page";
 import { LoginPage } from "./views/login-page";
@@ -10,19 +12,39 @@ import { SettingsPage } from "./views/settings-page";
 import { SignupPage } from "./views/signup-page";
 
 export const router = createBrowserRouter([
+  // Auth routes — redirect to /dashboard if already logged in
   {
-    path: "/",
-    element: <AppShell />,
+    element: <AuthGuard reverse />,
     children: [
-      { index: true, element: <LoginPage /> },
-      { path: "login", element: <LoginPage /> },
-      { path: "signup", element: <SignupPage /> },
-      { path: "catalog/:companySlug", element: <CatalogPage /> },
-      { path: "dashboard", element: <DashboardPage /> },
-      { path: "products", element: <ProductsPage /> },
-      { path: "products/new", element: <ProductEditorPage /> },
-      { path: "products/:productId/edit", element: <ProductEditorPage /> },
-      { path: "settings", element: <SettingsPage /> },
+      {
+        element: <AuthLayout />,
+        children: [
+          { path: "/login", element: <LoginPage /> },
+          { path: "/signup", element: <SignupPage /> },
+        ],
+      },
+    ],
+  },
+  // Public catalog — no auth required
+  {
+    path: "/catalog/:companySlug",
+    element: <CatalogPage />,
+  },
+  // Authenticated routes
+  {
+    element: <AuthGuard />,
+    children: [
+      {
+        element: <AppShell />,
+        children: [
+          { index: true, element: <DashboardPage /> },
+          { path: "/dashboard", element: <DashboardPage /> },
+          { path: "/products", element: <ProductsPage /> },
+          { path: "/products/new", element: <ProductEditorPage /> },
+          { path: "/products/:productId/edit", element: <ProductEditorPage /> },
+          { path: "/settings", element: <SettingsPage /> },
+        ],
+      },
     ],
   },
 ]);
