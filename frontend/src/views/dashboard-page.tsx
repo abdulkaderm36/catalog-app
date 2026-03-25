@@ -1,82 +1,137 @@
-const stats = [
-  { label: "Catalog views", value: "12,480", detail: "+14% vs last month" },
-  { label: "Product views", value: "38,210", detail: "Ridge Chair leads the month" },
-  { label: "Published products", value: "124", detail: "16 drafts are still in review" },
-  { label: "CTA clicks", value: "1,204", detail: "9.7% product click-through rate" },
-];
+import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/auth-context";
+import { StatCard } from "@/components/ui/stat-card";
+import { ProductTableRow } from "@/components/ui/product-table-row";
+import { SkeletonStat, SkeletonRow } from "@/components/ui/skeleton-card";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+
+interface DashboardStats {
+  totalProducts: number;
+  publishedProducts: number;
+  draftProducts: number;
+  catalogViews: number;
+  productViews: number;
+  topProduct: { name: string; views: number } | null;
+}
+
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  status: "published" | "draft";
+  createdAt: string;
+  imageUrl?: string;
+}
+
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 12) return "Good morning";
+  if (h < 17) return "Good afternoon";
+  return "Good evening";
+}
 
 export function DashboardPage() {
-  return (
-    <>
-      <section className="studio-lead">
-        <div className="section-label">Dashboard</div>
-        <h1>Catalog activity, product updates, and share performance in one workspace.</h1>
-        <p>
-          Review what customers opened, which products are getting attention, and what still needs to be published.
-        </p>
-      </section>
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
-      <section className="dashboard-band">
-        <div className="dashboard-hero-image" />
-        <aside className="dashboard-summary">
-          <div className="section-label">This month</div>
-          <div className="metric-list">
-            {stats.map((stat) => (
-              <div key={stat.label}>
-                <span>{stat.label}</span>
-                <strong>{stat.value}</strong>
-                <p>{stat.detail}</p>
-              </div>
+  const statsQuery = useQuery<DashboardStats>({
+    queryKey: ["dashboard-stats"],
+    queryFn: () =>
+      fetch("/api/dashboard/stats", { credentials: "include" }).then((r) => {
+        if (!r.ok) throw new Error("Failed to load stats");
+        return r.json();
+      }),
+  });
+
+  const productsQuery = useQuery<Product[]>({
+    queryKey: ["recent-products"],
+    queryFn: () =>
+      fetch("/api/products?limit=5&sort=createdAt", { credentials: "include" }).then((r) => {
+        if (!r.ok) throw new Error("Failed to load products");
+        return r.json();
+      }),
+  });
+
+  return (
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">Dashboard</h1>
+        <p className="text-sm text-[var(--text-secondary)] mt-0.5">
+          {getGreeting()}, {user?.companyName}
+        </p>
+      </div>
+
+      {/* Stats */}
+      {statsQuery.isLoading ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <SkeletonStat />
+          <SkeletonStat />
+          <SkeletonStat className="col-span-2 sm:col-span-1" />
+        </div>
+      ) : statsQuery.isError ? (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-600">
+          Could not load stats.{" "}
+          <button onClick={() => statsQuery.refetch()} className="underline ml-1">
+            Retry
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <StatCard
+            label="Total Products"
+            value={statsQuery.data!.totalProducts}
+            meta={`${statsQuery.data!.publishedProducts} published · ${statsQuery.data!.draftProducts} drafts`}
+          />
+          <StatCard label="Catalog Views" value={statsQuery.data!.catalogViews.toLocaleString()} accent />
+          <StatCard
+            label="Product Views"
+            value={statsQuery.data!.productViews.toLocaleString()}
+            meta={statsQuery.data!.topProduct ? `Top: ${statsQuery.data!.topProduct.name}` : undefined}
+            className="col-span-2 sm:col-span-1"
+          />
+        </div>
+      )}
+
+      {/* Recent Products */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Products</CardTitle>
+          <Button variant="ghost" size="sm" onClick={() => navigate("/products")}>
+            View all →
+          </Button>
+        </CardHeader>
+        {productsQuery.isLoading ? (
+          <div className="divide-y divide-[var(--border-subtle)]">
+            {[...Array(4)].map((_, i) => (
+              <SkeletonRow key={i} />
             ))}
           </div>
-        </aside>
-      </section>
-
-      <section className="section">
-        <div className="section-header">
-          <span className="section-label">Recent inventory movement</span>
-          <h2>Products updated most recently.</h2>
-          <p>Keep track of what changed, what went live, and what is still waiting for final review.</p>
-        </div>
-        <div className="inventory-list">
-          <article className="inventory-row">
-            <img
-              className="inventory-thumb"
-              src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80"
-              alt="Runner Pro Sneakers"
-            />
-            <div>
-              <h3>Runner Pro Sneakers</h3>
-              <p>Updated product photos and size notes, then moved into the featured collection.</p>
-            </div>
-            <span className="status-mark">Updated 2 hours ago</span>
-          </article>
-          <article className="inventory-row">
-            <img
-              className="inventory-thumb"
-              src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=900&q=80"
-              alt="Camera Kit"
-            />
-            <div>
-              <h3>Camera Kit</h3>
-              <p>Moved from draft to published and is now visible in the customer-facing catalog.</p>
-            </div>
-            <span className="status-mark">Published yesterday</span>
-          </article>
-          <article className="inventory-row">
-            <img
-              className="inventory-thumb"
-              src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=900&q=80"
-              alt="Sunglasses"
-            />
-            <div>
-              <h3>Cityline Sunglasses</h3>
-              <p>Created as a draft product with hidden price while the final description is still being reviewed.</p>
-            </div>
-            <span className="status-mark">Drafted yesterday</span>
-          </article>
-        </div>
-      </section>
-    </>
+        ) : productsQuery.isError ? (
+          <CardContent>
+            <p className="text-sm text-[var(--text-secondary)]">
+              Could not load products.{" "}
+              <button onClick={() => productsQuery.refetch()} className="underline text-[var(--accent)]">
+                Retry
+              </button>
+            </p>
+          </CardContent>
+        ) : productsQuery.data?.length === 0 ? (
+          <EmptyState
+            title="No products yet"
+            description="Add your first product to get started"
+            action={{ label: "+ Add product", onClick: () => navigate("/products/new") }}
+          />
+        ) : (
+          <div className="divide-y divide-[var(--border-subtle)]">
+            {productsQuery.data!.map((p) => (
+              <ProductTableRow key={p.id} product={p} />
+            ))}
+          </div>
+        )}
+      </Card>
+    </div>
   );
 }
