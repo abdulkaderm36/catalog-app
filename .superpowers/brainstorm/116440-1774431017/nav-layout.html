@@ -1,0 +1,191 @@
+<h2>Navigation layout</h2>
+<p class="subtitle">This affects every authenticated page. Which feels right for a catalog management tool?</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="sidebar" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0f1117;padding:14px;min-height:180px;display:flex;gap:10px;font-family:system-ui;">
+      <!-- Sidebar -->
+      <div style="width:52px;background:#161b27;border:1px solid #1e2537;border-radius:8px;padding:10px 0;display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;">
+        <div style="width:24px;height:24px;background:#d97706;border-radius:6px;margin-bottom:6px;"></div>
+        <div style="width:28px;height:28px;background:#d97706;border-radius:6px;display:flex;align-items:center;justify-content:center;">
+          <div style="width:12px;height:2px;background:#fff;box-shadow:0 3px 0 #fff, 0 -3px 0 #fff;"></div>
+        </div>
+        <div style="width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;">
+          <div style="width:10px;height:10px;border:2px solid #3d4f6e;border-radius:2px;"></div>
+        </div>
+        <div style="width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;">
+          <div style="width:10px;height:10px;border-radius:50%;border:2px solid #3d4f6e;"></div>
+        </div>
+        <div style="width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;">
+          <div style="width:10px;height:2px;background:#3d4f6e;box-shadow:0 3px 0 #3d4f6e;"></div>
+        </div>
+        <div style="flex:1;"></div>
+        <div style="width:24px;height:24px;background:#1e2537;border-radius:50%;"></div>
+      </div>
+      <!-- Main content -->
+      <div style="flex:1;display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="color:#f1f5f9;font-size:12px;font-weight:700;letter-spacing:-0.3px;">Dashboard</div>
+            <div style="color:#3d4f6e;font-size:9px;">Good morning, Acme Co.</div>
+          </div>
+          <button style="background:#d97706;color:#fff;border:none;border-radius:5px;font-size:8px;font-weight:700;padding:5px 10px;">+ Add Product</button>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <div style="flex:1;background:#161b27;border:1px solid #1e2537;border-radius:6px;padding:8px;">
+            <div style="color:#3d4f6e;font-size:7px;text-transform:uppercase;letter-spacing:1px;">Products</div>
+            <div style="color:#f1f5f9;font-size:15px;font-weight:700;">24</div>
+          </div>
+          <div style="flex:1;background:#d97706;border-radius:6px;padding:8px;">
+            <div style="color:rgba(255,255,255,0.6);font-size:7px;text-transform:uppercase;letter-spacing:1px;">Views</div>
+            <div style="color:#fff;font-size:15px;font-weight:700;">1.2k</div>
+          </div>
+          <div style="flex:1;background:#161b27;border:1px solid #1e2537;border-radius:6px;padding:8px;">
+            <div style="color:#3d4f6e;font-size:7px;text-transform:uppercase;letter-spacing:1px;">Published</div>
+            <div style="color:#f1f5f9;font-size:15px;font-weight:700;">18</div>
+          </div>
+        </div>
+        <div style="background:#161b27;border:1px solid #1e2537;border-radius:6px;padding:8px;flex:1;">
+          <div style="color:#3d4f6e;font-size:8px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Recent products</div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="color:#e2e8f0;font-size:8px;">Wool Scarf</span>
+              <span style="background:#fef3c7;color:#92400e;font-size:7px;padding:1px 5px;border-radius:3px;">Live</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="color:#e2e8f0;font-size:8px;">Leather Portfolio</span>
+              <span style="background:#1e2537;color:#3d4f6e;font-size:7px;padding:1px 5px;border-radius:3px;">Draft</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Icon Sidebar</h3>
+      <p>Compact icon rail on the left. Common in tools like Linear, Notion, Vercel. More horizontal space for content. Tooltips on hover reveal labels.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="sidebar-full" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0f1117;padding:14px;min-height:180px;display:flex;gap:10px;font-family:system-ui;">
+      <!-- Wide Sidebar -->
+      <div style="width:100px;background:#161b27;border:1px solid #1e2537;border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:3px;flex-shrink:0;">
+        <div style="display:flex;align-items:center;gap:5px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #1e2537;">
+          <div style="width:16px;height:16px;background:#d97706;border-radius:4px;flex-shrink:0;"></div>
+          <span style="color:#f1f5f9;font-size:9px;font-weight:700;">Acme Co.</span>
+        </div>
+        <div style="background:#d97706;border-radius:5px;padding:5px 7px;display:flex;align-items:center;gap:5px;">
+          <div style="width:8px;height:8px;background:rgba(255,255,255,0.8);border-radius:1px;"></div>
+          <span style="color:#fff;font-size:8px;font-weight:600;">Dashboard</span>
+        </div>
+        <div style="border-radius:5px;padding:5px 7px;display:flex;align-items:center;gap:5px;">
+          <div style="width:8px;height:8px;border:1px solid #3d4f6e;border-radius:1px;"></div>
+          <span style="color:#64748b;font-size:8px;">Products</span>
+        </div>
+        <div style="border-radius:5px;padding:5px 7px;display:flex;align-items:center;gap:5px;">
+          <div style="width:8px;height:8px;border-radius:50%;border:1px solid #3d4f6e;"></div>
+          <span style="color:#64748b;font-size:8px;">Catalog</span>
+        </div>
+        <div style="border-radius:5px;padding:5px 7px;display:flex;align-items:center;gap:5px;">
+          <div style="width:8px;height:2px;background:#3d4f6e;box-shadow:0 3px 0 #3d4f6e;"></div>
+          <span style="color:#64748b;font-size:8px;">Settings</span>
+        </div>
+        <div style="flex:1;"></div>
+        <div style="display:flex;align-items:center;gap:5px;padding-top:8px;border-top:1px solid #1e2537;">
+          <div style="width:16px;height:16px;background:#1e2537;border-radius:50%;"></div>
+          <span style="color:#64748b;font-size:7px;">John D.</span>
+        </div>
+      </div>
+      <!-- Main content -->
+      <div style="flex:1;display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div style="color:#f1f5f9;font-size:12px;font-weight:700;">Dashboard</div>
+          <button style="background:#d97706;color:#fff;border:none;border-radius:5px;font-size:8px;font-weight:700;padding:5px 10px;">+ Add</button>
+        </div>
+        <div style="display:flex;gap:5px;">
+          <div style="flex:1;background:#161b27;border:1px solid #1e2537;border-radius:6px;padding:7px;">
+            <div style="color:#3d4f6e;font-size:7px;letter-spacing:1px;">PRODUCTS</div>
+            <div style="color:#f1f5f9;font-size:15px;font-weight:700;">24</div>
+          </div>
+          <div style="flex:1;background:#d97706;border-radius:6px;padding:7px;">
+            <div style="color:rgba(255,255,255,0.6);font-size:7px;letter-spacing:1px;">VIEWS</div>
+            <div style="color:#fff;font-size:15px;font-weight:700;">1.2k</div>
+          </div>
+        </div>
+        <div style="background:#161b27;border:1px solid #1e2537;border-radius:6px;padding:8px;flex:1;">
+          <div style="color:#3d4f6e;font-size:7px;letter-spacing:1px;margin-bottom:5px;">RECENT</div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;justify-content:space-between;">
+              <span style="color:#e2e8f0;font-size:8px;">Wool Scarf</span>
+              <span style="color:#f59e0b;font-size:7px;">$120</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;">
+              <span style="color:#e2e8f0;font-size:8px;">Portfolio</span>
+              <span style="color:#f59e0b;font-size:7px;">$340</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Labeled Sidebar</h3>
+      <p>Full sidebar with company name, nav labels, and user profile. More context at a glance. Common in Shopify, Stripe, Supabase admin panels.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="topnav" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0f1117;padding:14px;min-height:180px;display:flex;flex-direction:column;gap:8px;font-family:system-ui;">
+      <!-- Top nav -->
+      <div style="background:#161b27;border:1px solid #1e2537;border-radius:8px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="display:flex;align-items:center;gap:5px;">
+            <div style="width:16px;height:16px;background:#d97706;border-radius:4px;"></div>
+            <span style="color:#f1f5f9;font-size:10px;font-weight:700;">Catalog</span>
+          </div>
+          <div style="width:1px;height:14px;background:#1e2537;"></div>
+          <div style="display:flex;gap:8px;">
+            <span style="background:#d97706;color:#fff;font-size:8px;font-weight:600;padding:3px 7px;border-radius:4px;">Dashboard</span>
+            <span style="color:#64748b;font-size:8px;padding:3px 7px;">Products</span>
+            <span style="color:#64748b;font-size:8px;padding:3px 7px;">Catalog</span>
+            <span style="color:#64748b;font-size:8px;padding:3px 7px;">Settings</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <button style="background:#d97706;color:#fff;border:none;border-radius:5px;font-size:8px;font-weight:700;padding:5px 10px;">+ Add Product</button>
+          <div style="width:20px;height:20px;background:#1e2537;border-radius:50%;"></div>
+        </div>
+      </div>
+      <!-- Content -->
+      <div style="flex:1;display:flex;flex-direction:column;gap:7px;">
+        <div style="color:#f1f5f9;font-size:12px;font-weight:700;">Dashboard</div>
+        <div style="display:flex;gap:6px;">
+          <div style="flex:1;background:#161b27;border:1px solid #1e2537;border-radius:6px;padding:8px;">
+            <div style="color:#3d4f6e;font-size:7px;text-transform:uppercase;letter-spacing:1px;">Products</div>
+            <div style="color:#f1f5f9;font-size:15px;font-weight:700;">24</div>
+          </div>
+          <div style="flex:1;background:#d97706;border-radius:6px;padding:8px;">
+            <div style="color:rgba(255,255,255,0.6);font-size:7px;text-transform:uppercase;letter-spacing:1px;">Views</div>
+            <div style="color:#fff;font-size:15px;font-weight:700;">1.2k</div>
+          </div>
+          <div style="flex:1;background:#161b27;border:1px solid #1e2537;border-radius:6px;padding:8px;">
+            <div style="color:#3d4f6e;font-size:7px;text-transform:uppercase;letter-spacing:1px;">Published</div>
+            <div style="color:#f1f5f9;font-size:15px;font-weight:700;">18</div>
+          </div>
+        </div>
+        <div style="background:#161b27;border:1px solid #1e2537;border-radius:6px;padding:8px;flex:1;">
+          <div style="color:#3d4f6e;font-size:7px;letter-spacing:1px;margin-bottom:5px;">RECENT PRODUCTS</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="color:#e2e8f0;font-size:8px;">Wool Scarf</span>
+            <span style="background:#fef3c7;color:#92400e;font-size:7px;padding:1px 5px;border-radius:3px;">Live</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Top Navigation</h3>
+      <p>Horizontal nav bar at top. Maximum vertical space for content. Familiar pattern (GitHub, Netlify). Works especially well on wider screens.</p>
+    </div>
+  </div>
+
+</div>

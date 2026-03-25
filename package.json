@@ -1,0 +1,16 @@
+{
+  "name": "catalog-app",
+  "private": true,
+  "packageManager": "bun@1.3.8",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "bun run --filter frontend dev & bun run --filter backend dev",
+    "dev:frontend": "bun run --filter frontend dev",
+    "dev:backend": "bun run --filter backend dev",
+    "build": "bun run --filter frontend build && bun run --filter backend build",
+    "check": "bun run --filter frontend check && bun run --filter backend check"
+  }
+}
