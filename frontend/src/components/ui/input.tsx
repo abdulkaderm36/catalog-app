@@ -1,19 +1,13 @@
-import * as React from "react";
-
 import { cn } from "@/lib/utils";
 
-function Input({ className, type, ...props }: React.ComponentProps<"input">) {
+export function Input({ className, ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
-      type={type}
-      data-slot="input"
       className={cn(
-        "flex h-12 w-full min-w-0 border-0 border-b border-[rgba(29,21,15,0.18)] bg-transparent px-0 py-3 text-base text-[color:var(--ink-900)] outline-none transition-colors placeholder:text-[color:var(--ink-500)] focus-visible:border-[color:var(--rust-500)] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-        className,
+        "w-full h-9 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-3 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent transition-all",
+        className
       )}
       {...props}
     />
   );
 }
-
-export { Input };

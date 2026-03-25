@@ -1,18 +1,13 @@
-import * as React from "react";
-
 import { cn } from "@/lib/utils";
 
-function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
+export function Textarea({ className, ...props }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea
-      data-slot="textarea"
       className={cn(
-        "flex min-h-28 w-full rounded-none border-0 border-b border-[rgba(29,21,15,0.18)] bg-transparent px-0 py-3 text-base text-[color:var(--ink-900)] outline-none transition-colors placeholder:text-[color:var(--ink-500)] focus-visible:border-[color:var(--rust-500)] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-        className,
+        "w-full min-h-[100px] rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent transition-all resize-y",
+        className
       )}
       {...props}
     />
   );
 }
-
-export { Textarea };

@@ -1,22 +1,22 @@
-import * as React from "react";
-
 import { cn } from "@/lib/utils";
 
-function Card({ className, ...props }: React.ComponentProps<"div">) {
+export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      data-slot="card"
-      className={cn(
-        "rounded-[28px] border border-[rgba(247,242,232,0.5)] bg-[rgba(247,242,232,0.88)] shadow-[var(--shadow-soft)] backdrop-blur-xl",
-        className,
-      )}
+      className={cn("rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-[var(--shadow-card)]", className)}
       {...props}
     />
   );
 }
 
-function CardContent({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="card-content" className={cn("p-8", className)} {...props} />;
+export function CardHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn("flex items-center justify-between px-5 py-4 border-b border-[var(--border-subtle)]", className)} {...props} />;
 }
 
-export { Card, CardContent };
+export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
+  return <h3 className={cn("text-sm font-semibold text-[var(--text-primary)]", className)} {...props} />;
+}
+
+export function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn("p-5", className)} {...props} />;
+}
