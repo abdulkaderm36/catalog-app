@@ -1,14 +1,19 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Package, Plus, BookOpen } from "lucide-react";
+import { LayoutDashboard, Package, Plus, BookOpen, type LucideIcon } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 import { cn } from "@/lib/utils";
 
-const tabs = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/products", label: "Products", icon: Package },
-  { to: "/products/new", label: "Add", icon: Plus, isAction: true },
-  { label: "Catalog", icon: BookOpen, isCatalog: true },
-] as const;
+type NavTab = { kind: "nav"; to: string; label: string; icon: LucideIcon };
+type ActionTab = { kind: "action"; to: string; label: string; icon: LucideIcon };
+type CatalogTab = { kind: "catalog"; label: string; icon: LucideIcon };
+type Tab = NavTab | ActionTab | CatalogTab;
+
+const tabs: Tab[] = [
+  { kind: "nav", to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { kind: "nav", to: "/products", label: "Products", icon: Package },
+  { kind: "action", to: "/products/new", label: "Add", icon: Plus },
+  { kind: "catalog", label: "Catalog", icon: BookOpen },
+];
 
 export function MobileTabBar() {
   const { user } = useAuth();
@@ -21,7 +26,7 @@ export function MobileTabBar() {
     >
       <div className="flex h-[60px]">
         {tabs.map((tab) => {
-          if ("isCatalog" in tab && tab.isCatalog) {
+          if (tab.kind === "catalog") {
             return (
               <button
                 key={tab.label}
@@ -35,9 +40,13 @@ export function MobileTabBar() {
             );
           }
 
-          if ("isAction" in tab && tab.isAction) {
+          if (tab.kind === "action") {
             return (
-              <NavLink key={tab.label} to={tab.to} className="flex-1 flex flex-col items-center justify-center gap-0.5">
+              <NavLink
+                key={tab.label}
+                to={tab.to}
+                className="flex-1 flex flex-col items-center justify-center gap-0.5"
+              >
                 <div className="w-9 h-9 rounded-xl bg-[var(--accent)] flex items-center justify-center">
                   <tab.icon className="w-5 h-5 text-white" />
                 </div>
@@ -52,7 +61,9 @@ export function MobileTabBar() {
               className={({ isActive }) =>
                 cn(
                   "flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors",
-                  isActive ? "text-[var(--accent)]" : "text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
+                  isActive
+                    ? "text-[var(--accent)]"
+                    : "text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
                 )
               }
             >
