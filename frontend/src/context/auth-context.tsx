@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import type { ReactNode } from "react";
+import { apiFetch, getToken, setToken, removeToken } from "@/lib/api";
 
 interface User {
   id: string;
@@ -12,8 +13,8 @@ interface User {
 interface AuthContextValue {
   user: User | null;
   isLoading: boolean;
-  login: (user: User) => void;
-  logout: () => Promise<void>;
+  login: (token: string, user: User) => void;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -23,8 +24,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const token = getToken();
+    if (!token) {
+      setIsLoading(false);
+      return;
+    }
     const controller = new AbortController();
-    fetch("/api/auth/me", { credentials: "include", signal: controller.signal })
+    apiFetch("/api/auth/me", { signal: controller.signal })
       .then(r => r.ok ? r.json() : null)
       .then(data => setUser(data))
       .catch(err => { if (err.name !== "AbortError") setUser(null); })
@@ -32,14 +38,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => controller.abort();
   }, []);
 
-  const login = useCallback((u: User) => setUser(u), []);
+  const login = useCallback((token: string, userData: User) => {
+    setToken(token);
+    setUser(userData);
+  }, []);
 
-  const logout = useCallback(async () => {
-    try {
-      await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
-    } catch {
-      // Network failure — still clear local state
-    }
+  const logout = useCallback(() => {
+    removeToken();
     setUser(null);
   }, []);
 
