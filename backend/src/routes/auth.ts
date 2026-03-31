@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import type { AuthVariables } from "@/middleware/auth";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import { db } from "@/db/index";
@@ -6,7 +7,7 @@ import { users } from "@/db/schema";
 import { signToken } from "@/lib/auth";
 import { authMiddleware } from "@/middleware/auth";
 
-const auth = new Hono();
+const auth = new Hono<{ Variables: AuthVariables }>();
 
 auth.post("/signup", async (c) => {
   const body = await c.req.json().catch(() => null);
@@ -61,7 +62,7 @@ auth.post("/login", async (c) => {
 });
 
 auth.get("/me", authMiddleware, async (c) => {
-  const userId = c.get("userId") as string;
+  const userId = c.get("userId");
   const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
   if (!user) {
     return c.json({ error: "User not found" }, 404);

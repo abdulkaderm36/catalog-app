@@ -14,12 +14,12 @@ export function removeToken(): void {
 
 export function apiFetch(input: string, init: RequestInit = {}): Promise<Response> {
   const token = getToken();
-  return fetch(input, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...init.headers,
-    },
-  });
+  const headers: Record<string, string> = {
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(init.headers as Record<string, string>),
+  };
+  if (!headers["Content-Type"] && !(init.body instanceof FormData)) {
+    headers["Content-Type"] = "application/json";
+  }
+  return fetch(input, { ...init, headers });
 }

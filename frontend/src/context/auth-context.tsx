@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     const controller = new AbortController();
     apiFetch("/api/auth/me", { signal: controller.signal })
-      .then(r => r.ok ? r.json() : null)
+      .then(r => { if (!r.ok) { removeToken(); return null; } return r.json(); })
       .then(data => setUser(data))
       .catch(err => { if (err.name !== "AbortError") setUser(null); })
       .finally(() => setIsLoading(false));

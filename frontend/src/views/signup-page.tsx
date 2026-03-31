@@ -66,6 +66,10 @@ export function SignupPage() {
     const meRes = await fetch("/api/auth/me", {
       headers: { Authorization: `Bearer ${token}` },
     });
+    if (!meRes.ok) {
+      toast.error("Failed to load user profile");
+      return;
+    }
     const user = await meRes.json();
     login(token, user);
     navigate("/dashboard");
