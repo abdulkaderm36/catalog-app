@@ -1,61 +1,104 @@
 import { Hono } from "hono";
+import { eq, and, desc } from "drizzle-orm";
+import { db } from "@/db/index";
+import { products } from "@/db/schema";
 import { authMiddleware } from "@/middleware/auth";
+import type { AuthVariables } from "@/middleware/auth";
 
-const products = new Hono();
+const productsRouter = new Hono<{ Variables: AuthVariables }>();
+productsRouter.use("*", authMiddleware);
 
-products.use("*", authMiddleware);
-
-products.get("/", (c) => {
-  return c.json([
-    { id: "prod_1", name: "Ridge Chair", price: 349, status: "published", featured: true, createdAt: "2025-01-10T10:00:00Z" },
-    { id: "prod_2", name: "Atlas Desk Lamp", price: 89, status: "draft", featured: false, createdAt: "2025-01-08T09:00:00Z" },
-    { id: "prod_3", name: "Canvas Tote Bag", price: 45, status: "published", featured: false, createdAt: "2025-01-06T14:00:00Z" },
-  ]);
+productsRouter.get("/", async (c) => {
+  const userId = c.get("userId");
+  const rows = await db
+    .select()
+    .from(products)
+    .where(eq(products.userId, userId))
+    .orderBy(desc(products.createdAt));
+  return c.json(rows.map(toProduct));
 });
 
-products.post("/", async (c) => {
+productsRouter.post("/", async (c) => {
+  const userId = c.get("userId");
   const body = await c.req.json().catch(() => null);
-
-  return c.json(
-    {
-      message: "Create product route scaffolded.",
-      received: body,
-    },
-    201,
-  );
+  if (!body?.name) {
+    return c.json({ error: "Missing required fields" }, 400);
+  }
+  const [row] = await db
+    .insert(products)
+    .values({
+      userId,
+      name: body.name,
+      description: body.description ?? "",
+      price: String(body.price ?? 0),
+      sku: body.sku ?? null,
+      category: body.category ?? null,
+      status: body.status ?? "draft",
+      featured: body.featured ?? false,
+      slug: body.slug ?? null,
+      externalUrl: body.externalUrl ?? null,
+      images: body.images ?? [],
+    })
+    .returning();
+  return c.json(toProduct(row), 201);
 });
 
-products.get("/:id", (c) => {
-  return c.json({
-    id: c.req.param("id"),
-    title: "Ridge Chair",
-    status: "published",
-  });
+productsRouter.get("/:id", async (c) => {
+  const userId = c.get("userId");
+  const [row] = await db
+    .select()
+    .from(products)
+    .where(and(eq(products.id, c.req.param("id")), eq(products.userId, userId)))
+    .limit(1);
+  if (!row) return c.json({ error: "Not found" }, 404);
+  return c.json(toProduct(row));
 });
 
-products.patch("/:id", async (c) => {
+productsRouter.put("/:id", async (c) => {
+  const userId = c.get("userId");
   const body = await c.req.json().catch(() => null);
-
-  return c.json({
-    message: `Update product ${c.req.param("id")} route scaffolded.`,
-    received: body,
-  });
+  const [existing] = await db
+    .select()
+    .from(products)
+    .where(and(eq(products.id, c.req.param("id")), eq(products.userId, userId)))
+    .limit(1);
+  if (!existing) return c.json({ error: "Not found" }, 404);
+  const [row] = await db
+    .update(products)
+    .set({
+      name: body.name ?? existing.name,
+      description: body.description ?? existing.description,
+      price: body.price != null ? String(body.price) : existing.price,
+      sku: body.sku ?? existing.sku,
+      category: body.category ?? existing.category,
+      status: body.status ?? existing.status,
+      featured: body.featured ?? existing.featured,
+      slug: body.slug ?? existing.slug,
+      externalUrl: body.externalUrl ?? existing.externalUrl,
+      images: body.images ?? existing.images,
+    })
+    .where(eq(products.id, c.req.param("id")))
+    .returning();
+  return c.json(toProduct(row));
 });
 
-products.delete("/:id", (c) => {
-  return c.json({
-    message: `Delete product ${c.req.param("id")} route scaffolded.`,
-  });
+productsRouter.delete("/:id", async (c) => {
+  const userId = c.get("userId");
+  const [existing] = await db
+    .select()
+    .from(products)
+    .where(and(eq(products.id, c.req.param("id")), eq(products.userId, userId)))
+    .limit(1);
+  if (!existing) return c.json({ error: "Not found" }, 404);
+  await db.delete(products).where(eq(products.id, c.req.param("id")));
+  return c.json({ ok: true });
 });
 
-products.post("/:id/images/presign", async (c) => {
-  const body = await c.req.json().catch(() => null);
+function toProduct(row: typeof products.$inferSelect) {
+  return {
+    ...row,
+    price: Number(row.price),
+  };
+}
 
-  return c.json({
-    message: "Presign route scaffolded for MinIO uploads.",
-    productId: c.req.param("id"),
-    received: body,
-  });
-});
-
-export { products };
+export { productsRouter as products };
