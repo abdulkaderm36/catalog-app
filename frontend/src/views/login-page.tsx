@@ -26,15 +26,18 @@ export function LoginPage() {
     const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: "include",
       body: JSON.stringify(data),
     });
     if (!res.ok) {
       toast.error("Invalid email or password");
       return;
     }
-    const user = await res.json();
-    login(user);
+    const { token } = await res.json();
+    const meRes = await fetch("/api/auth/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const user = await meRes.json();
+    login(token, user);
     navigate("/dashboard");
   };
 
