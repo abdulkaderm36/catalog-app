@@ -57,6 +57,7 @@ productsRouter.get("/:id", async (c) => {
 productsRouter.put("/:id", async (c) => {
   const userId = c.get("userId");
   const body = await c.req.json().catch(() => null);
+  if (!body) return c.json({ error: "Missing required fields" }, 400);
   const [existing] = await db
     .select()
     .from(products)
@@ -69,12 +70,12 @@ productsRouter.put("/:id", async (c) => {
       name: body.name ?? existing.name,
       description: body.description ?? existing.description,
       price: body.price != null ? String(body.price) : existing.price,
-      sku: body.sku ?? existing.sku,
-      category: body.category ?? existing.category,
+      sku: "sku" in body ? body.sku : existing.sku,
+      category: "category" in body ? body.category : existing.category,
       status: body.status ?? existing.status,
       featured: body.featured ?? existing.featured,
-      slug: body.slug ?? existing.slug,
-      externalUrl: body.externalUrl ?? existing.externalUrl,
+      slug: "slug" in body ? body.slug : existing.slug,
+      externalUrl: "externalUrl" in body ? body.externalUrl : existing.externalUrl,
       images: body.images ?? existing.images,
     })
     .where(and(eq(products.id, c.req.param("id")), eq(products.userId, userId)))
@@ -84,13 +85,11 @@ productsRouter.put("/:id", async (c) => {
 
 productsRouter.delete("/:id", async (c) => {
   const userId = c.get("userId");
-  const [existing] = await db
-    .select()
-    .from(products)
+  const [deleted] = await db
+    .delete(products)
     .where(and(eq(products.id, c.req.param("id")), eq(products.userId, userId)))
-    .limit(1);
-  if (!existing) return c.json({ error: "Not found" }, 404);
-  await db.delete(products).where(and(eq(products.id, c.req.param("id")), eq(products.userId, userId)));
+    .returning({ id: products.id });
+  if (!deleted) return c.json({ error: "Not found" }, 404);
   return c.json({ ok: true });
 });
 
