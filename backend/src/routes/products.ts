@@ -1,9 +1,13 @@
 import { Hono } from "hono";
 import { eq, and, desc } from "drizzle-orm";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { db } from "@/db/index";
 import { products } from "@/db/schema";
 import { authMiddleware } from "@/middleware/auth";
 import type { AuthVariables } from "@/middleware/auth";
+import { minioClient } from "@/lib/minio";
+import { env } from "@/config/env";
 
 const productsRouter = new Hono<{ Variables: AuthVariables }>();
 productsRouter.use("*", authMiddleware);
@@ -91,6 +95,33 @@ productsRouter.delete("/:id", async (c) => {
     .returning({ id: products.id });
   if (!deleted) return c.json({ error: "Not found" }, 404);
   return c.json({ ok: true });
+});
+
+productsRouter.post("/:id/images/presign", async (c) => {
+  const body = await c.req.json().catch(() => null);
+  if (!body?.fileName || !body?.contentType) {
+    return c.json({ error: "Missing fileName or contentType" }, 400);
+  }
+  const productId = c.req.param("id");
+  const imageId = crypto.randomUUID();
+  const key = `products/${productId}/${imageId}`;
+  const command = new PutObjectCommand({
+    Bucket: env.MINIO_BUCKET,
+    Key: key,
+    ContentType: body.contentType,
+  });
+  const uploadUrl = await getSignedUrl(minioClient, command, { expiresIn: 300 });
+  return c.json({ uploadUrl, imageId });
+});
+
+productsRouter.post("/:id/images/confirm", async (c) => {
+  const body = await c.req.json().catch(() => null);
+  if (!body?.imageId) {
+    return c.json({ error: "Missing imageId" }, 400);
+  }
+  const productId = c.req.param("id");
+  const url = `${env.MINIO_ENDPOINT}/${env.MINIO_BUCKET}/products/${productId}/${body.imageId}`;
+  return c.json({ id: body.imageId, url, isCover: false });
 });
 
 function toProduct(row: typeof products.$inferSelect) {

@@ -80,4 +80,27 @@ auth.post("/logout", (c) => {
   return c.json({ ok: true });
 });
 
+auth.put("/password", authMiddleware, async (c) => {
+  const userId = c.get("userId");
+  const body = await c.req.json().catch(() => null);
+  if (!body?.currentPassword || !body?.newPassword) {
+    return c.json({ error: "Missing required fields" }, 400);
+  }
+  const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  if (!user) return c.json({ error: "User not found" }, 404);
+
+  const valid = await bcrypt.compare(body.currentPassword, user.password);
+  if (!valid) return c.json({ error: "Invalid current password" }, 401);
+
+  const hashed = await bcrypt.hash(body.newPassword, 10);
+  await db.update(users).set({ password: hashed }).where(eq(users.id, userId));
+  return c.json({ ok: true });
+});
+
+auth.delete("/account", authMiddleware, async (c) => {
+  const userId = c.get("userId");
+  await db.delete(users).where(eq(users.id, userId));
+  return c.json({ ok: true });
+});
+
 export { auth };

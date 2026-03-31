@@ -7,6 +7,7 @@ import { env } from "@/config/env";
 import { analytics } from "@/routes/analytics";
 import { auth } from "@/routes/auth";
 import { catalog } from "@/routes/catalog";
+import { dashboard } from "@/routes/dashboard";
 import { products } from "@/routes/products";
 import { settings } from "@/routes/settings";
 
@@ -40,6 +41,7 @@ app.route("/api/v1/products", products);
 app.route("/api/v1/catalog", catalog);
 app.route("/api/v1/analytics", analytics);
 app.route("/api/v1/settings", settings);
+app.route("/api/v1/dashboard", dashboard);
 
 serve(
   {
@@ -50,5 +52,3 @@ serve(
     console.log(`API listening on http://localhost:${info.port}`);
   },
 );
-
-export default app;
