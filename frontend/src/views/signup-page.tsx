@@ -55,16 +55,19 @@ export function SignupPage() {
     const res = await fetch("/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: "include",
       body: JSON.stringify(payload),
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      toast.error((err as { message?: string }).message ?? "Failed to create account");
+      toast.error((err as { error?: string }).error ?? "Failed to create account");
       return;
     }
-    const user = await res.json();
-    login(user);
+    const { token } = await res.json();
+    const meRes = await fetch("/api/auth/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const user = await meRes.json();
+    login(token, user);
     navigate("/dashboard");
   };
 
