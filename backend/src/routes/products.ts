@@ -77,7 +77,7 @@ productsRouter.put("/:id", async (c) => {
       externalUrl: body.externalUrl ?? existing.externalUrl,
       images: body.images ?? existing.images,
     })
-    .where(eq(products.id, c.req.param("id")))
+    .where(and(eq(products.id, c.req.param("id")), eq(products.userId, userId)))
     .returning();
   return c.json(toProduct(row));
 });
@@ -90,7 +90,7 @@ productsRouter.delete("/:id", async (c) => {
     .where(and(eq(products.id, c.req.param("id")), eq(products.userId, userId)))
     .limit(1);
   if (!existing) return c.json({ error: "Not found" }, 404);
-  await db.delete(products).where(eq(products.id, c.req.param("id")));
+  await db.delete(products).where(and(eq(products.id, c.req.param("id")), eq(products.userId, userId)));
   return c.json({ ok: true });
 });
 
