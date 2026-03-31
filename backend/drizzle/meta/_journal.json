@@ -8,6 +8,13 @@
       "when": 1774952150217,
       "tag": "0000_milky_dazzler",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1774958471674,
+      "tag": "0001_stormy_katie_power",
+      "breakpoints": true
     }
   ]
 }
