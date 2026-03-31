@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/auth-context";
+import { apiFetch } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -63,10 +64,8 @@ export function SettingsPage() {
   const passwordForm = useForm({ resolver: zodResolver(passwordSchema) });
 
   const saveProfile = async (data: z.infer<typeof profileSchema>) => {
-    const res = await fetch("/api/settings/company", {
+    const res = await apiFetch("/api/settings/company", {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
       body: JSON.stringify(data),
     });
     if (!res.ok) { toast.error("Failed to save"); return; }
@@ -74,10 +73,8 @@ export function SettingsPage() {
   };
 
   const saveAccount = async (data: z.infer<typeof accountSchema>) => {
-    const res = await fetch("/api/settings/account", {
+    const res = await apiFetch("/api/settings/account", {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
       body: JSON.stringify(data),
     });
     if (!res.ok) { toast.error("Failed to save"); return; }
@@ -85,10 +82,8 @@ export function SettingsPage() {
   };
 
   const savePassword = async (data: z.infer<typeof passwordSchema>) => {
-    const res = await fetch("/api/auth/password", {
+    const res = await apiFetch("/api/auth/password", {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
       body: JSON.stringify({ currentPassword: data.currentPassword, newPassword: data.newPassword }),
     });
     if (!res.ok) { toast.error("Failed to update password"); return; }
@@ -99,11 +94,11 @@ export function SettingsPage() {
 
   const deleteAccount = async () => {
     setIsDeleting(true);
-    const res = await fetch("/api/auth/account", { method: "DELETE", credentials: "include" });
+    const res = await apiFetch("/api/auth/account", { method: "DELETE" });
     setIsDeleting(false);
     if (!res.ok) { toast.error("Failed to delete account"); return; }
     setDeleteDialogOpen(false);
-    await logout();
+    logout();
     navigate("/login");
     toast("Account deleted");
   };

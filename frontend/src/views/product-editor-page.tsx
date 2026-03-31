@@ -12,6 +12,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { ImageUpload, type UploadedImage } from "@/components/ui/image-upload";
+import { apiFetch } from "@/lib/api";
 
 const schema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -56,7 +57,7 @@ export function ProductEditorPage() {
   useQuery({
     queryKey: ["product", productId],
     queryFn: () =>
-      fetch(`/api/products/${productId}`, { credentials: "include" }).then((r) => r.json()),
+      apiFetch(`/api/products/${productId}`).then((r) => r.json()),
     enabled: isEditing,
     select: (data: FormData & { images?: UploadedImage[] }) => {
       reset(data);
@@ -69,10 +70,8 @@ export function ProductEditorPage() {
     mutationFn: async (data: FormData) => {
       const url = isEditing ? `/api/products/${productId}` : "/api/products";
       const method = isEditing ? "PUT" : "POST";
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify({ ...data, images }),
       });
       if (!res.ok) {
@@ -96,14 +95,9 @@ export function ProductEditorPage() {
       { id: tempId, url: URL.createObjectURL(file), isCover: prev.length === 0, progress: 0 },
     ]);
     try {
-      const { uploadUrl, imageId } = await fetch(
+      const { uploadUrl, imageId } = await apiFetch(
         `/api/products/${productId ?? "new"}/images/presign`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ fileName: file.name, contentType: file.type }),
-        }
+        { method: "POST", body: JSON.stringify({ fileName: file.name, contentType: file.type }) }
       ).then((r) => r.json());
 
       const xhr = new XMLHttpRequest();
@@ -120,14 +114,9 @@ export function ProductEditorPage() {
         xhr.send(file);
       });
 
-      const confirmed: UploadedImage = await fetch(
+      const confirmed: UploadedImage = await apiFetch(
         `/api/products/${productId ?? "new"}/images/confirm`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ imageId }),
-        }
+        { method: "POST", body: JSON.stringify({ imageId }) }
       ).then((r) => r.json());
 
       setImages((prev) => prev.map((i) => (i.id === tempId ? { ...confirmed, progress: 100 } : i)));

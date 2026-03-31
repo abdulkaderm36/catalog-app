@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/auth-context";
+import { apiFetch } from "@/lib/api";
 import { StatCard } from "@/components/ui/stat-card";
 import { ProductTableRow } from "@/components/ui/product-table-row";
 import { SkeletonStat, SkeletonRow } from "@/components/ui/skeleton-card";
@@ -40,7 +41,7 @@ export function DashboardPage() {
   const statsQuery = useQuery<DashboardStats>({
     queryKey: ["dashboard-stats"],
     queryFn: () =>
-      fetch("/api/dashboard/stats", { credentials: "include" }).then((r) => {
+      apiFetch("/api/dashboard/stats").then((r) => {
         if (!r.ok) throw new Error("Failed to load stats");
         return r.json();
       }),
@@ -49,7 +50,7 @@ export function DashboardPage() {
   const productsQuery = useQuery<Product[]>({
     queryKey: ["recent-products"],
     queryFn: () =>
-      fetch("/api/products?limit=5&sort=createdAt", { credentials: "include" }).then((r) => {
+      apiFetch("/api/products?limit=5&sort=createdAt").then((r) => {
         if (!r.ok) throw new Error("Failed to load products");
         return r.json();
       }),

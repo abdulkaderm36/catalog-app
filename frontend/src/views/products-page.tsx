@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/auth-context";
 import { useDebounce } from "@/hooks/use-debounce";
 import { cn } from "@/lib/utils";
+import { apiFetch } from "@/lib/api";
 
 interface Product {
   id: string;
@@ -38,7 +39,7 @@ export function ProductsPage() {
   const query = useQuery<Product[]>({
     queryKey: ["products"],
     queryFn: () =>
-      fetch("/api/products", { credentials: "include" }).then((r) => {
+      apiFetch("/api/products").then((r) => {
         if (!r.ok) throw new Error("Failed to load products");
         return r.json();
       }),
