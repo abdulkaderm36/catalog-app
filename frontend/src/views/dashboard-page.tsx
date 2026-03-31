@@ -18,13 +18,19 @@ interface DashboardStats {
   topProduct: { name: string; views: number } | null;
 }
 
+interface ProductImage {
+  id: string;
+  url: string;
+  isCover: boolean;
+}
+
 interface Product {
   id: string;
   name: string;
   price: number;
   status: "published" | "draft";
   createdAt: string;
-  imageUrl?: string;
+  images?: ProductImage[];
 }
 
 function getGreeting() {
@@ -128,7 +134,13 @@ export function DashboardPage() {
         ) : (
           <div className="divide-y divide-[var(--border-subtle)]">
             {productsQuery.data!.map((p) => (
-              <ProductTableRow key={p.id} product={p} />
+              <ProductTableRow
+                  key={p.id}
+                  product={{
+                    ...p,
+                    imageUrl: (p.images?.find((i) => i.isCover) ?? p.images?.[0])?.url,
+                  }}
+                />
             ))}
           </div>
         )}

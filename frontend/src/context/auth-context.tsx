@@ -32,9 +32,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const controller = new AbortController();
     apiFetch("/api/auth/me", { signal: controller.signal })
       .then(r => { if (!r.ok) { removeToken(); return null; } return r.json(); })
-      .then(data => setUser(data))
-      .catch(err => { if (err.name !== "AbortError") setUser(null); })
-      .finally(() => setIsLoading(false));
+      .then(data => { setUser(data); setIsLoading(false); })
+      .catch(err => {
+        // AbortError means StrictMode cleanup fired — keep isLoading=true so the
+        // second effect invocation can resolve properly without triggering a redirect.
+        if (err.name !== "AbortError") { setUser(null); setIsLoading(false); }
+      });
     return () => controller.abort();
   }, []);
 

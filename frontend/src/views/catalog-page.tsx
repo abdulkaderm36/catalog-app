@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { PublicNav } from "@/components/layout/public-nav";
 import { CatalogCard } from "@/components/ui/catalog-card";
@@ -9,21 +9,29 @@ import { Toaster } from "@/components/ui/sonner";
 import { useDebounce } from "@/hooks/use-debounce";
 import { cn } from "@/lib/utils";
 
+interface CatalogProduct {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  images?: Array<{ id: string; url: string; isCover: boolean }>;
+  category?: string;
+  featured?: boolean;
+  externalUrl?: string;
+}
+
 interface CatalogData {
   company: { name: string; description?: string; logoUrl?: string };
-  products: Array<{
-    id: string;
-    name: string;
-    description?: string;
-    price: number;
-    imageUrl?: string;
-    category?: string;
-    featured?: boolean;
-  }>;
+  products: CatalogProduct[];
+}
+
+function coverUrl(p: CatalogProduct) {
+  return (p.images?.find((i) => i.isCover) ?? p.images?.[0])?.url;
 }
 
 export function CatalogPage() {
   const { companySlug } = useParams<{ companySlug: string }>();
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const debouncedSearch = useDebounce(search, 300);
@@ -153,7 +161,11 @@ export function CatalogPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {filtered.map((p) => (
-              <CatalogCard key={p.id} product={p} onDetails={() => {}} />
+              <CatalogCard
+                key={p.id}
+                product={{ ...p, imageUrl: coverUrl(p) }}
+                onDetails={() => navigate(`/catalog/${companySlug}/products/${p.id}`)}
+              />
             ))}
           </div>
         )}

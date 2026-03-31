@@ -2,12 +2,13 @@ import { useRef, useState, useCallback } from "react";
 import { DndContext, closestCenter, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, useSortable, arrayMove, rectSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { X, GripVertical } from "lucide-react";
+import { X, GripVertical, FileImage } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface UploadedImage {
   id: string;
   url: string;
+  displayUrl?: string; // blob URL for local preview; falls back to url
   isCover: boolean;
   progress?: number;
 }
@@ -28,6 +29,7 @@ function SortableImage({
   onSetCover: (id: string) => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: image.id });
+  const [imgError, setImgError] = useState(false);
   return (
     <div
       ref={setNodeRef}
@@ -37,7 +39,18 @@ function SortableImage({
         image.isCover ? "border-[var(--accent)]" : "border-[var(--border)]"
       )}
     >
-      <img src={image.url} alt="" className="w-full h-20 object-cover" />
+      {!imgError ? (
+        <img
+          src={image.displayUrl ?? image.url}
+          alt=""
+          className="w-full h-20 object-cover"
+          onError={() => setImgError(true)}
+        />
+      ) : (
+        <div className="w-full h-20 bg-[var(--bg-elevated)] flex items-center justify-center">
+          <FileImage className="w-6 h-6 text-[var(--text-muted)]" />
+        </div>
+      )}
       {image.progress !== undefined && image.progress < 100 && (
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-[var(--border)]">
           <div className="h-full bg-[var(--accent)] transition-all" style={{ width: `${image.progress}%` }} />

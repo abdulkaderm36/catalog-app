@@ -1,3 +1,6 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { FileImage } from "lucide-react";
 import { StatusBadge } from "./status-badge";
 
 interface Product {
@@ -16,12 +19,24 @@ function getStatus(p: Product): "published" | "draft" | "new" {
 }
 
 export function ProductTableRow({ product }: { product: Product }) {
+  const navigate = useNavigate();
+  const [imgError, setImgError] = useState(false);
   return (
-    <div className="flex items-center gap-3 px-4 py-3 hover:bg-[var(--bg-elevated)] transition-colors">
-      <div className="w-9 h-9 rounded-lg bg-[var(--bg-elevated)] flex-shrink-0 overflow-hidden">
-        {product.imageUrl ? (
-          <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
-        ) : null}
+    <div
+      className="flex items-center gap-3 px-4 py-3 hover:bg-[var(--bg-elevated)] transition-colors cursor-pointer"
+      onClick={() => navigate(`/products/${product.id}/edit`)}
+    >
+      <div className="w-9 h-9 rounded-lg bg-[var(--bg-elevated)] flex-shrink-0 overflow-hidden flex items-center justify-center">
+        {product.imageUrl && !imgError ? (
+          <img
+            src={product.imageUrl}
+            alt={product.name}
+            className="w-full h-full object-cover"
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <FileImage className="w-4 h-4 text-[var(--text-muted)]" />
+        )}
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-[var(--text-primary)] truncate">{product.name}</p>

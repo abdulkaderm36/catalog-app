@@ -54,17 +54,22 @@ export function ProductEditorPage() {
     }
   }, [productName, isEditing, setValue]);
 
-  useQuery({
+  const { data: productData } = useQuery<FormData & { images?: UploadedImage[] }>({
     queryKey: ["product", productId],
     queryFn: () =>
       apiFetch(`/api/products/${productId}`).then((r) => r.json()),
     enabled: isEditing,
-    select: (data: FormData & { images?: UploadedImage[] }) => {
-      reset(data);
-      setImages(data.images ?? []);
-      return data;
-    },
   });
+
+  useEffect(() => {
+    if (productData) {
+      reset(productData);
+      // Strip displayUrl/progress — blob URLs from prior sessions are invalid
+      setImages(
+        (productData.images ?? []).map(({ displayUrl: _d, progress: _p, ...img }) => img)
+      );
+    }
+  }, [productData]);
 
   const saveMutation = useMutation({
     mutationFn: async (data: FormData) => {
@@ -72,7 +77,10 @@ export function ProductEditorPage() {
       const method = isEditing ? "PUT" : "POST";
       const res = await apiFetch(url, {
         method,
-        body: JSON.stringify({ ...data, images }),
+        body: JSON.stringify({
+          ...data,
+          images: images.map(({ displayUrl: _d, progress: _p, ...img }) => img),
+        }),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -119,7 +127,7 @@ export function ProductEditorPage() {
         { method: "POST", body: JSON.stringify({ imageId }) }
       ).then((r) => r.json());
 
-      setImages((prev) => prev.map((i) => (i.id === tempId ? { ...confirmed, progress: 100 } : i)));
+      setImages((prev) => prev.map((i) => (i.id === tempId ? { ...confirmed, isCover: i.isCover, displayUrl: i.url, progress: 100 } : i)));
     } catch {
       setImages((prev) => prev.filter((i) => i.id !== tempId));
       toast.error("Image upload failed");

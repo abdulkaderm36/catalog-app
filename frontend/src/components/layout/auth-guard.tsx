@@ -1,4 +1,4 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/auth-context";
 
 interface AuthGuardProps {
@@ -6,8 +6,11 @@ interface AuthGuardProps {
   children?: React.ReactNode;
 }
 
+const GUEST_ONLY_PATHS = ["/login", "/signup"];
+
 export function AuthGuard({ reverse = false, children }: AuthGuardProps) {
   const { user, isLoading } = useAuth();
+  const location = useLocation();
 
   if (isLoading) {
     return (
@@ -18,7 +21,9 @@ export function AuthGuard({ reverse = false, children }: AuthGuardProps) {
   }
 
   if (!reverse && !user) return <Navigate to="/login" replace />;
-  if (reverse && user) return <Navigate to="/dashboard" replace />;
+  if (reverse && user && GUEST_ONLY_PATHS.includes(location.pathname)) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   return children ? <>{children}</> : <Outlet />;
 }

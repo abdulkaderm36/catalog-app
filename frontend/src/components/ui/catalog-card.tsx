@@ -1,3 +1,6 @@
+import { useState } from "react";
+import { FileImage } from "lucide-react";
+
 interface CatalogProduct {
   id: string;
   name: string;
@@ -7,14 +10,22 @@ interface CatalogProduct {
 }
 
 export function CatalogCard({ product, onDetails }: { product: CatalogProduct; onDetails: () => void }) {
+  const [imgError, setImgError] = useState(false);
   return (
     <div
       className="rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] overflow-hidden hover:border-[var(--accent-pale-border)] transition-colors duration-150 cursor-pointer"
       onClick={onDetails}
     >
-      <div className="h-[130px] bg-gradient-to-br from-[var(--bg-elevated)] to-[var(--border)]">
-        {product.imageUrl && (
-          <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+      <div className="h-[130px] bg-gradient-to-br from-[var(--bg-elevated)] to-[var(--border)] flex items-center justify-center">
+        {product.imageUrl && !imgError ? (
+          <img
+            src={product.imageUrl}
+            alt={product.name}
+            className="w-full h-full object-cover"
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <FileImage className="w-8 h-8 text-[var(--text-muted)]" />
         )}
       </div>
       <div className="p-4">

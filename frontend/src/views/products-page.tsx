@@ -11,13 +11,19 @@ import { useDebounce } from "@/hooks/use-debounce";
 import { cn } from "@/lib/utils";
 import { apiFetch } from "@/lib/api";
 
+interface ProductImage {
+  id: string;
+  url: string;
+  isCover: boolean;
+}
+
 interface Product {
   id: string;
   name: string;
   price: number;
   status: "published" | "draft";
   featured?: boolean;
-  imageUrl?: string;
+  images?: ProductImage[];
   createdAt: string;
 }
 
@@ -116,7 +122,14 @@ export function ProductsPage() {
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {filtered.map((p) => (
-            <ProductCard key={p.id} product={{ ...p, companySlug: user?.companySlug }} />
+            <ProductCard
+                key={p.id}
+                product={{
+                  ...p,
+                  companySlug: user?.companySlug,
+                  imageUrl: (p.images?.find((i) => i.isCover) ?? p.images?.[0])?.url,
+                }}
+              />
           ))}
         </div>
       )}
