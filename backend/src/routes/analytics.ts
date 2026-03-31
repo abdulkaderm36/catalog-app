@@ -1,6 +1,9 @@
 import { Hono } from "hono";
+import { authMiddleware } from "@/middleware/auth";
 
 const analytics = new Hono();
+
+analytics.use("*", authMiddleware);
 
 analytics.get("/overview", (c) => {
   return c.json({

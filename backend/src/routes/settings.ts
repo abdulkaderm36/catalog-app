@@ -1,6 +1,9 @@
 import { Hono } from "hono";
+import { authMiddleware } from "@/middleware/auth";
 
 const settings = new Hono();
+
+settings.use("*", authMiddleware);
 
 settings.get("/", (c) => {
   return c.json({

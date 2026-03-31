@@ -1,14 +1,16 @@
 import { Hono } from "hono";
+import { authMiddleware } from "@/middleware/auth";
 
 const products = new Hono();
 
+products.use("*", authMiddleware);
+
 products.get("/", (c) => {
-  return c.json({
-    items: [
-      { id: "prod_1", title: "Ridge Chair", status: "published" },
-      { id: "prod_2", title: "Atlas Desk Lamp", status: "draft" },
-    ],
-  });
+  return c.json([
+    { id: "prod_1", name: "Ridge Chair", price: 349, status: "published", featured: true, createdAt: "2025-01-10T10:00:00Z" },
+    { id: "prod_2", name: "Atlas Desk Lamp", price: 89, status: "draft", featured: false, createdAt: "2025-01-08T09:00:00Z" },
+    { id: "prod_3", name: "Canvas Tote Bag", price: 45, status: "published", featured: false, createdAt: "2025-01-06T14:00:00Z" },
+  ]);
 });
 
 products.post("/", async (c) => {
